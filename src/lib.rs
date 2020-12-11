@@ -1,18 +1,15 @@
 use js_sys::Function;
-use js_sys::Object;
-use std::future::Future;
 use wasm_bindgen::JsValue;
-use wasm_bindgen_futures::JsFuture;
-use std::panic;
 use serde::{Deserialize, Serialize};
 use js_sys::Promise;
 use wasm_bindgen_futures::spawn_local;
 
 
-pub type Callback = fn(&Result<JsValue, JsValue>) -> ();
+pub type Callback = Box<dyn Fn(Result<JsValue, JsValue>) -> ()>;
+
 
 #[derive(Debug, Clone)]
-pub struct EIP1193 {
+pub struct Provider {
     pub this: JsValue,
     pub request: Function
 }
@@ -23,7 +20,7 @@ pub struct RequestMethod {
 }
 
 
-impl EIP1193 {
+impl Provider {
     pub fn get_request() -> Option<Function> {
         let request = js_sys::Reflect::get(
             &*web_sys::window()?.get("ethereum")?,
@@ -34,7 +31,7 @@ impl EIP1193 {
 
     pub fn new() -> Result<Self, String> {
         match Self::get_request() {
-            Some(req) => Ok(EIP1193{ this: JsValue::null(), request: req}),
+            Some(req) => Ok(Provider{ this: JsValue::null(), request: req}),
             None => Err("Failed on get `window.ethereum.request`".to_string())
         }
     }
@@ -53,9 +50,9 @@ impl EIP1193 {
         }
     }
 
-    fn request(self, method: String, cb: Callback) -> () {
+    pub fn request(self, method: String, cb: Callback) -> () {
         let wrap = async move {
-            cb(&self.async_request(method).await);
+            cb(self.async_request(method).await);
         };
         spawn_local(wrap);
     }
