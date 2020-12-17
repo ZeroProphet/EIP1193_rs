@@ -7,6 +7,7 @@ use web_sys::Event;
 use web_sys::EventTarget;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
+use wasm_bindgen_futures::spawn_local;
 
 pub type Callback = Box<dyn Fn(Result<JsValue, JsValue>) -> ()>;
 
@@ -34,6 +35,15 @@ impl Provider {
         return Provider {this: JsValue::from(provider), request: Function::from(request)};
     }
 
+    pub fn on(self, event: String, callback: Box<dyn FnMut(Event)>) -> Result<(), JsValue>{
+        // doc: https://rustwasm.github.io/wasm-bindgen/examples/paint.html
+        let closure = Closure::wrap(callback);
+        return EventTarget::from(
+            self.this
+        ).add_event_listener_with_callback(&event, closure.as_ref().unchecked_ref())
+    }
+
+
     pub async fn request(self, method: String, params: Option<Vec<String>> ) -> Result<JsValue, JsValue> {
         let ret = self.request.call2(
             &self.this,
@@ -47,13 +57,5 @@ impl Provider {
             },
            Err(e) => Err(e)
         }
-    }
-
-    pub fn on(self, event: String, callback: Box<dyn FnMut(Event)>) -> Result<(), JsValue>{
-        // doc: https://rustwasm.github.io/wasm-bindgen/examples/paint.html
-        let closure = Closure::wrap(callback);
-        return EventTarget::from(
-            self.this
-        ).add_event_listener_with_callback(&event, closure.as_ref().unchecked_ref())
     }
 }

@@ -36,7 +36,7 @@ impl Component for DAOApp {
         Self {
             link: link,
             chain_id: None,
-            provider: Provider::new().unwrap()
+            provider: Provider::new()
         }
     }
 
