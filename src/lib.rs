@@ -42,7 +42,6 @@ impl Provider {
         ).add_event_listener_with_callback(&event, closure.as_ref().unchecked_ref())
     }
 
-
     pub async fn request(self, method: String, params: Option<Vec<String>> ) -> Result<JsValue, JsValue> {
         let ret = self.request.call2(
             &self.this,

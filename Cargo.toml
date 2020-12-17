@@ -3,8 +3,13 @@ name = "EIP1193"
 version = "0.1.0"
 authors = ["Ryan.K <ryankung@ieee.org>"]
 edition = "2018"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+license = "GPL-2.0"
+keywords = ["wasm", "EIP1193", "Ethereum"]
+categories = ["api-binding", "wasm", "web-programming"]
+readme = "README.md"
+repository = "https://github.com/RyanKung/EIP1193_rs"
+exclude = ["build/**/*.o", "doc/**/*.html"]
+include = ["src/**/*", "Cargo.toml"]
 
 [dependencies]
 js-sys = "0.3.44"
