@@ -2,8 +2,6 @@ use js_sys::Function;
 use wasm_bindgen::JsValue;
 use serde::{Deserialize, Serialize};
 use js_sys::Promise;
-use wasm_bindgen_futures::spawn_local;
-
 
 pub type Callback = Box<dyn Fn(Result<JsValue, JsValue>) -> ()>;
 
@@ -18,7 +16,6 @@ pub struct Provider {
 pub struct RequestMethod {
     method: String
 }
-
 
 impl Provider {
     pub fn get_request() -> Option<Function> {
@@ -36,7 +33,7 @@ impl Provider {
         }
     }
 
-    async fn async_request(self, method: String) -> Result<JsValue, JsValue> {
+    pub async fn request(self, method: String) -> Result<JsValue, JsValue> {
         let ret = self.request.call1(
             &self.this,
             &JsValue::from_serde(&RequestMethod{method: method}).unwrap()
@@ -48,12 +45,5 @@ impl Provider {
             },
            Err(e) => Err(e)
         }
-    }
-
-    pub fn request(self, method: String, cb: Callback) -> () {
-        let wrap = async move {
-            cb(self.async_request(method).await);
-        };
-        spawn_local(wrap);
     }
 }

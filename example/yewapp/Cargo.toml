@@ -1,0 +1,20 @@
+[package]
+name = "byzantalk"
+version = "0.1.0"
+authors = ["Ryan.K <ryankung@ieee.org>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+yew = "0.17"
+wasm-bindgen = {version = "0.2.67", features = ["serde-serialize"]}
+libp2p-wasm-ext = "0.21.0"
+web-sys = "0.3.44"
+js-sys = "0.3.44"
+serde = "1.0"
+serde_json = "1.0"
+EIP1193 = { path = "../../../EIP1193_rs" }
+console_error_panic_hook = "0.1.6"
+wasm-bindgen-futures = "0.4.17"

@@ -7,11 +7,21 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-web-sys = "0.3.44"
 js-sys = "0.3.44"
-wasm-bindgen = {version = "0.2.67", features = ["serde-serialize"]}
+wasm-bindgen = { version = "0.2.67", features = ["serde-serialize"]}
 wasm-bindgen-futures = "0.4.17"
-serde = "1.0"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+[dependencies.web-sys]
+version = "0.3.4"
+features = [
+  'Document',
+  'Element',
+  'HtmlElement',
+  'Node',
+  'Window',
+]
 
 [lib]
 crate-type = ["cdylib", "rlib"]
