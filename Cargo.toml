@@ -10,6 +10,7 @@ readme = "README.md"
 repository = "https://github.com/RyanKung/EIP1193_rs"
 exclude = ["build/**/*.o", "doc/**/*.html"]
 include = ["src/**/*", "Cargo.toml"]
+description ="This package implementated a bridge for Etherum Provider (EIP1193)."
 
 [dependencies]
 js-sys = "0.3.44"
