@@ -7,7 +7,6 @@ use web_sys::Event;
 use web_sys::EventTarget;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
-use wasm_bindgen_futures::spawn_local;
 
 pub type Callback = Box<dyn Fn(Result<JsValue, JsValue>) -> ()>;
 
