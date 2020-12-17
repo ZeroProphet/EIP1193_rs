@@ -3,6 +3,10 @@ use wasm_bindgen::JsValue;
 use serde::{Deserialize, Serialize};
 use js_sys::Promise;
 use std::vec::Vec;
+use web_sys::Event;
+use web_sys::EventTarget;
+use wasm_bindgen::closure::Closure;
+use wasm_bindgen::JsCast;
 
 pub type Callback = Box<dyn Fn(Result<JsValue, JsValue>) -> ()>;
 
@@ -18,20 +22,16 @@ pub struct RequestMethod {
     method: String
 }
 
-impl Provider {
-    fn get_request() -> Option<Function> {
-        let request = js_sys::Reflect::get(
-            &*web_sys::window()?.get("ethereum")?,
-            &JsValue::from("request")
-        ).ok()?;
-        Some(Function::from(request))
-    }
 
-    pub fn new() -> Result<Self, String> {
-        match Self::get_request() {
-            Some(req) => Ok(Provider{ this: JsValue::null(), request: req}),
-            None => Err("Failed on get `window.ethereum.request`".to_string())
-        }
+impl Provider {
+
+    pub fn new() -> Self {
+        let provider = web_sys::window().unwrap().get("ethereum").unwrap();
+        let request = js_sys::Reflect::get(
+            &provider,
+            &JsValue::from("request")
+        ).unwrap();
+        return Provider {this: JsValue::from(provider), request: Function::from(request)};
     }
 
     pub async fn request(self, method: String, params: Option<Vec<String>> ) -> Result<JsValue, JsValue> {
@@ -47,5 +47,13 @@ impl Provider {
             },
            Err(e) => Err(e)
         }
+    }
+
+    pub fn on(self, event: String, callback: Box<dyn FnMut(Event)>) -> Result<(), JsValue>{
+        // doc: https://rustwasm.github.io/wasm-bindgen/examples/paint.html
+        let closure = Closure::wrap(callback);
+        return EventTarget::from(
+            self.this
+        ).add_event_listener_with_callback(&event, closure.as_ref().unchecked_ref())
     }
 }
