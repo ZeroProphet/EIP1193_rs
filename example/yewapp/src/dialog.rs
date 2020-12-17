@@ -50,7 +50,7 @@ impl Component for DAOApp {
                 let link = self.link.clone();
                 let provider = self.provider.clone();
                 spawn_local(async move {
-                    match provider.request("eth_chainId".to_string()).await {
+                    match provider.request("eth_chainId".to_string(), None).await {
                         Ok(cid) => {
                             link.send_message(Msg::GotBlockId(stringify(&cid).unwrap().as_string().unwrap()));
                         },

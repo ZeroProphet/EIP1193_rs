@@ -2,6 +2,7 @@ use js_sys::Function;
 use wasm_bindgen::JsValue;
 use serde::{Deserialize, Serialize};
 use js_sys::Promise;
+use std::vec::Vec;
 
 pub type Callback = Box<dyn Fn(Result<JsValue, JsValue>) -> ()>;
 
@@ -33,10 +34,11 @@ impl Provider {
         }
     }
 
-    pub async fn request(self, method: String) -> Result<JsValue, JsValue> {
-        let ret = self.request.call1(
+    pub async fn request(self, method: String, params: Option<Vec<String>> ) -> Result<JsValue, JsValue> {
+        let ret = self.request.call2(
             &self.this,
-            &JsValue::from_serde(&RequestMethod{method: method}).unwrap()
+            &JsValue::from_serde(&RequestMethod{method: method}).unwrap(),
+            &JsValue::from_serde(&params).unwrap()
         );
         match ret {
             Ok(s)=> {
