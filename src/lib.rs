@@ -19,7 +19,7 @@ pub struct RequestMethod {
 }
 
 impl Provider {
-    pub fn get_request() -> Option<Function> {
+    fn get_request() -> Option<Function> {
         let request = js_sys::Reflect::get(
             &*web_sys::window()?.get("ethereum")?,
             &JsValue::from("request")
