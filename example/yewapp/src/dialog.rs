@@ -49,16 +49,22 @@ impl Component for DAOApp {
                 // });
                 let link = self.link.clone();
                 let provider = self.provider.clone();
-                spawn_local(async move {
-                    match provider.request("eth_chainId".to_string(), None).await {
-                        Ok(cid) => {
-                            link.send_message(Msg::GotBlockId(stringify(&cid).unwrap().as_string().unwrap()));
-                        },
-                        Err(e) => {
-                            link.send_message(Msg::GotBlockId(stringify(&e).unwrap().as_string().unwrap()));
+                provider.request(
+                    "eth_chainId".to_string(),
+                    None,
+                    box link,
+                    box |m, l| {
+                        let link = l.downcast_ref::<ComponentLink<Self>>().unwrap();
+                        match m {
+                            Ok(cid) => {
+                                link.send_message(Msg::GotBlockId(stringify(&cid).unwrap().as_string().unwrap()));
+                            },
+                            Err(e) => {
+                                link.send_message(Msg::GotBlockId(stringify(&e).unwrap().as_string().unwrap()));
+                            }
                         }
                     }
-                });
+                );
                 return true;
             },
             Msg::GotBlockId(x) => {
@@ -67,7 +73,6 @@ impl Component for DAOApp {
             }
         }
     }
-
     fn change(&mut self, _props: Self::Properties) -> ShouldRender {
         false
     }

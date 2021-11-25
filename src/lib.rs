@@ -7,6 +7,8 @@ use web_sys::Event;
 use web_sys::EventTarget;
 use wasm_bindgen::closure::Closure;
 use wasm_bindgen::JsCast;
+use wasm_bindgen_futures::spawn_local;
+use std::any::Any;
 
 pub type Callback = Box<dyn Fn(Result<JsValue, JsValue>) -> ()>;
 
@@ -42,7 +44,7 @@ impl Provider {
         ).add_event_listener_with_callback(&event, closure.as_ref().unchecked_ref())
     }
 
-    pub async fn request(self, method: String, params: Option<Vec<String>> ) -> Result<JsValue, JsValue> {
+    pub async fn async_request(self, method: String, params: Option<Vec<String>> ) -> Result<JsValue, JsValue> {
         let ret = self.request.call2(
             &self.this,
             &JsValue::from_serde(&RequestMethod{method: method}).unwrap(),
@@ -55,5 +57,18 @@ impl Provider {
             },
            Err(e) => Err(e)
         }
+    }
+
+    pub fn request(
+        self,
+        method: String,
+        params: Option<Vec<String>>,
+        ctx: Box<dyn Any>,
+        callback: Box<dyn Fn(Result<JsValue, JsValue>, Box<dyn Any>) -> ()>
+    ) -> () {
+        spawn_local(async move {
+            callback(self.async_request(method.clone(), params).await, ctx)
+        });
+
     }
 }
